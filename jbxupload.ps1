@@ -47,9 +47,9 @@ function SubmitFileToJoeSandbox {
         throw "Please provide the file path."
     }
 	
-	if (-not (Test-Path $filePath)) 
+	if (-not (Test-Path $file_path)) 
 	{
-		throw "File $filePath does not exist."
+		throw "File $file_path does not exist."
 	}
 
 	if (-not $api_key) {
@@ -88,6 +88,7 @@ function SubmitFileToJoeSandbox {
 		"--$boundary--$LF"
 	) -join $LF
 
+
 	$response = Invoke-RestMethod -UserAgent $USER_AGENT -Uri ($api_url + "/api/v2/submission/new") -Method Post -ContentType "multipart/form-data; boundary=`"$boundary`"" -Body $bodyLines;
 	
 	$responseJSON = $response | ConvertTo-Json
@@ -99,7 +100,7 @@ function SubmitFileToJoeSandbox {
 	
 	try
 	{
-		$fileStream = [System.IO.FileStream]::new($filePath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
+		$fileStream = [System.IO.FileStream]::new($file_path, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
 
 		# Read the file in chunks
 		$chunkCount = [math]::Ceiling($fileStream.Length / $chunkSize)
@@ -121,7 +122,7 @@ function SubmitFileToJoeSandbox {
 			$chunkBodyLines = (
 				"--$boundary",
 				"Content-Disposition: form-data; name=`"apikey`"$LF",
-				"$API_KEY",
+				"$api_key",
 				"--$boundary",
 				"Content-Disposition: form-data; name=`"submission_id`"$LF",
 				"$submission_id",
